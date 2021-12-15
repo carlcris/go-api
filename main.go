@@ -9,7 +9,8 @@ import (
 )
 
 func SayHello(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Hello World"})
+	name := c.Param("name")
+	c.JSON(http.StatusOK, gin.H{"message": "Hello " + name})
 }
 
 func main() {
@@ -24,7 +25,7 @@ func main() {
 	router.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "Welcome to Go Programming")
 	})
-	router.GET("/say-hello", SayHello)
+	router.GET("/say-hello/:name", SayHello)
 
 	router.Run(":" + port)
 }
