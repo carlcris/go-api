@@ -22,11 +22,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
+
 	port := os.Getenv("PORT")
 
 	if port == "" {
 		log.Fatal("$PORT must be set")
 	}
+
 	router := gin.Default()
 
 	router.GET("/", func(c *gin.Context) {
@@ -35,6 +37,8 @@ func main() {
 	router.GET("/say-hello/:name", SayHello)
 	router.GET("/patients", model.GetPatientList)
 	router.GET("/patients/patient/:id", model.GetUserByID)
-
+	router.GET("/patients-add", model.GetPatientAddress)
+	router.GET("/patients/address/:id", model.GetPatientAddressById)
+	//router.Run(":8080")
 	router.Run(":" + port)
 }

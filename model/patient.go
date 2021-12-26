@@ -8,19 +8,22 @@ import (
 )
 
 type Patient struct {
-	PatientID string //gorm convert field name to snake_case. So PatientID become patient_id
-	FirstName string //first_name
-	LastName  string //last_name
-	DOB       string
+	PatientId string
+	FirstName string
+	LastName  string
+	Dob       string
+	Address   Address `gorm:"embedded"`
 }
 type Address struct {
-	Address1 string
-	City     string
-	State    string
-	Zip      string
+	AddressId string
+	Address1  string
+	City      string
+	State     string
+	Zip       string
 }
 
-func (p *Patient) savePatient() (*Patient, error) {
+func (p *Patient) SavePatient() (*Patient, error) {
+
 	db, err := CreateDatabaseConnection()
 
 	if err != nil {
@@ -33,6 +36,22 @@ func (p *Patient) savePatient() (*Patient, error) {
 	}
 
 	return p, nil
+}
+
+func GetPatientAddressById(c *gin.Context) {
+	var a Address
+
+	uid := c.Param("id")
+	if db, err := CreateDatabaseConnection(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	} else {
+		if err = db.Find(&a, "address_id = ?", uid).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "success", "data": a})
+	}
 }
 
 func GetUserByID(c *gin.Context) {
@@ -70,4 +89,22 @@ func GetPatientList(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "success", "data": patients})
+}
+func GetPatientAddress(c *gin.Context) {
+
+	var p Patient
+	db, err := CreateDatabaseConnection()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+	}
+
+	if err = db.Table("patient").
+		Select("patient.*, address.*").
+		Joins("JOIN address ON patient.patient_id = address.patient_id").
+		Find(&p).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "success", "data": p})
+
 }

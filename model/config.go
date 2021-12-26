@@ -7,3 +7,7 @@ type Tabler interface {
 func (Patient) TableName() string {
 	return "patient"
 }
+
+func (Address) TableName() string {
+	return "address"
+}
