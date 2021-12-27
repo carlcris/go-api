@@ -88,7 +88,7 @@ func GetPatientList(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "success", "data": patients})
+	c.JSON(http.StatusOK, patients)
 }
 func GetPatientAddress(c *gin.Context) {
 
@@ -96,13 +96,16 @@ func GetPatientAddress(c *gin.Context) {
 	db, err := CreateDatabaseConnection()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
 	}
 
-	if err = db.Table("patient").
-		Select("patient.*, address.*").
+	result := db.Table("patient").
+		Select("patient.patient_id, patient.first_name, patient.last_name, patient.dob, address.address_id, address.address1, address.city, address.state, address.zip").
 		Joins("JOIN address ON patient.patient_id = address.patient_id").
-		Find(&p).Error; err != nil {
+		Find(&p)
+	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "success", "data": p})
