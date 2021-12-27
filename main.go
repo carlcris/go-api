@@ -7,6 +7,7 @@ import (
 
 	"go-api/model"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -15,7 +16,9 @@ func SayHello(c *gin.Context) {
 	name := c.Param("name")
 	c.JSON(http.StatusOK, gin.H{"message": "Hello " + name})
 }
-
+func welcome(c *gin.Context) {
+	c.JSON(http.StatusOK, "Patient Service Running")
+}
 func main() {
 
 	err := godotenv.Load(".env")
@@ -31,9 +34,9 @@ func main() {
 
 	router := gin.Default()
 
-	router.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "Welcome to Go Programming")
-	})
+	router.Use(cors.Default())
+
+	router.GET("/", welcome)
 	router.GET("/say-hello/:name", SayHello)
 	router.GET("/patients", model.GetPatientList)
 	router.GET("/patients/patient/:id", model.GetUserByID)
