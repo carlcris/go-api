@@ -87,7 +87,6 @@ func GetPatientList(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusOK, patients)
 }
 func GetPatientAddress(c *gin.Context) {
