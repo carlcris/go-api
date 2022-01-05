@@ -70,15 +70,15 @@ func GetPatientByID(c *gin.Context) {
 			Joins("JOIN address ON patient.patient_id = address.patient_id").
 			Where("patient.patient_id =?", uid).
 			First(&p)
-
-		if result.Error != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-			return
-		}
 		if result.RecordNotFound() {
 			c.JSON(http.StatusNotFound, gin.H{"message": "Record Not Found"})
 			return
 		}
+		if result.Error != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			return
+		}
+
 		c.JSON(http.StatusOK, p)
 	}
 }
