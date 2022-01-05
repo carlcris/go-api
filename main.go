@@ -39,7 +39,7 @@ func main() {
 	router.GET("/", welcome)
 	router.GET("/say-hello/:name", SayHello)
 	router.GET("/patients", model.GetPatientList)
-	router.GET("/patients/patient/:id", model.GetUserByID)
+	router.GET("/patients/patient/:id", model.GetPatientByID)
 	router.GET("/patients-add", model.GetPatientAddress)
 	router.GET("/patients/address/:id", model.GetPatientAddressById)
 	//router.Run(":8080")

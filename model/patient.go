@@ -1,7 +1,6 @@
 package model
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,7 +10,11 @@ type Patient struct {
 	PatientId string
 	FirstName string
 	LastName  string
-	Dob       string
+	MI        string
+	BirthDate string
+	Email     string
+	Phone     string
+	SSN       string
 	Address   Address `gorm:"embedded"`
 }
 type Address struct {
@@ -54,28 +57,31 @@ func GetPatientAddressById(c *gin.Context) {
 	}
 }
 
-func GetUserByID(c *gin.Context) {
+func GetPatientByID(c *gin.Context) {
 	var p Patient
 
 	uid := c.Param("id")
-	log.Println(uid)
 	if db, err := CreateDatabaseConnection(); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	} else {
-		if err := db.Find(&p, "patient_id = ?", uid).Error; err != nil {
+		result := db.Table("patient").
+			Select("patient.patient_id, patient.first_name, patient.last_name, patient.mi, patient.birth_date, patient.ssn, patient.phone, patient.email, address.address_id, address.address1, address.city, address.state, address.zip").
+			Joins("JOIN address ON patient.patient_id = address.patient_id").
+			Where("patient.patient_id =?", uid).
+			Find(&p)
+		if result.Error != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
-		log.Println(p)
 
-		c.JSON(http.StatusOK, gin.H{"message": "success", "data": p})
+		c.JSON(http.StatusOK, p)
 	}
 }
 
 func GetPatientList(c *gin.Context) {
 
-	var patients []Patient
+	var p []Patient
 	db, err := CreateDatabaseConnection()
 
 	if err != nil {
@@ -83,11 +89,16 @@ func GetPatientList(c *gin.Context) {
 		return
 	}
 
-	if err = db.Find(&patients).Error; err != nil {
+	result := db.Table("patient").
+		Select("patient.patient_id, patient.first_name, patient.last_name, patient.mi, patient.birth_date, patient.ssn, patient.phone, patient.email, address.address_id, address.address1, address.city, address.state, address.zip").
+		Joins("JOIN address ON patient.patient_id = address.patient_id").
+		Find(&p)
+	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, patients)
+
+	c.JSON(http.StatusOK, p)
 }
 func GetPatientAddress(c *gin.Context) {
 
