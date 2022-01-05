@@ -15,7 +15,8 @@ type Patient struct {
 	Email     string  `json:"email"`
 	Phone     string  `json:"phone"`
 	SSN       string  `json:"ssn"`
-	Address   Address `gorm:"embedded"`
+	Gender    string  `json:"gender"`
+	Address   Address `gorm:"embedded" json:"address"`
 }
 type Address struct {
 	AddressId string `json:"addressId"`
@@ -66,7 +67,7 @@ func GetPatientByID(c *gin.Context) {
 		return
 	} else {
 		result := db.Table("patient").
-			Select("patient.patient_id, patient.first_name, patient.last_name, patient.mi, patient.birth_date, patient.ssn, patient.phone, patient.email, address.address_id, address.address1, address.city, address.state, address.zip").
+			Select("patient.patient_id, patient.first_name, patient.last_name, patient.mi, patient.birth_date, patient.ssn, patient.phone, patient.email, patient.gender, address.address_id, address.address1, address.city, address.state, address.zip").
 			Joins("JOIN address ON patient.patient_id = address.patient_id").
 			Where("patient.patient_id =?", uid).
 			First(&p)
@@ -94,7 +95,7 @@ func GetPatientList(c *gin.Context) {
 	}
 
 	result := db.Table("patient").
-		Select("patient.patient_id, patient.first_name, patient.last_name, patient.mi, patient.birth_date, patient.ssn, patient.phone, patient.email, address.address_id, address.address1, address.city, address.state, address.zip").
+		Select("patient.patient_id, patient.first_name, patient.last_name, patient.mi, patient.birth_date, patient.ssn, patient.phone, patient.email, patient.gender, address.address_id, address.address1, address.city, address.state, address.zip").
 		Joins("JOIN address ON patient.patient_id = address.patient_id").
 		Find(&p)
 	if result.Error != nil {
